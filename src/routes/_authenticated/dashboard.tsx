@@ -24,12 +24,13 @@ function Dashboard() {
   const { data: cryptoQ = [] } = useQuery({ queryKey: ["crypto"], queryFn: () => crypto(), refetchInterval: 60_000 });
   const { data: fxQ = [] } = useQuery({ queryKey: ["fx"], queryFn: () => fx(), refetchInterval: 60_000 });
 
-  const cards = [
+  type Card = { label: string; value: number; prefix?: string; suffix?: string; decimals?: number; icon: typeof DollarSign; accent: "success" | "destructive" | "primary" };
+  const cards: Card[] = [
     { label: "Total P&L", value: stats?.totalPnl ?? 0, prefix: "$", icon: DollarSign, accent: (stats?.totalPnl ?? 0) >= 0 ? "success" : "destructive" },
     { label: "Win Rate", value: stats?.winRate ?? 0, suffix: "%", icon: Target, decimals: 1, accent: "primary" },
     { label: "Total Trades", value: stats?.total ?? 0, icon: Activity, accent: "primary" },
     { label: "Avg R:R", value: stats?.avgRR ?? 0, decimals: 2, prefix: "1:", icon: TrendingUp, accent: "success" },
-  ] as const;
+  ];
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
