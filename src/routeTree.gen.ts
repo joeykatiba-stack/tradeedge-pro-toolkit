@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ToolsRouteImport } from './routes/tools'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CalendarRouteImport } from './routes/calendar'
@@ -26,6 +27,11 @@ import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authentica
 const ToolsRoute = ToolsRouteImport.update({
   id: '/tools',
   path: '/tools',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/calendar': typeof CalendarRoute
   '/contact': typeof ContactRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tools': typeof ToolsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/calendar': typeof CalendarRoute
   '/contact': typeof ContactRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tools': typeof ToolsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -125,6 +133,7 @@ export interface FileRoutesById {
   '/calendar': typeof CalendarRoute
   '/contact': typeof ContactRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tools': typeof ToolsRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/contact'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/tools'
     | '/analytics'
     | '/dashboard'
@@ -155,6 +165,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/contact'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/tools'
     | '/analytics'
     | '/dashboard'
@@ -170,6 +181,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/contact'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/tools'
     | '/_authenticated/analytics'
     | '/_authenticated/dashboard'
@@ -186,6 +198,7 @@ export interface RootRouteChildren {
   CalendarRoute: typeof CalendarRoute
   ContactRoute: typeof ContactRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ToolsRoute: typeof ToolsRoute
 }
 
@@ -196,6 +209,13 @@ declare module '@tanstack/react-router' {
       path: '/tools'
       fullPath: '/tools'
       preLoaderRoute: typeof ToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -312,6 +332,7 @@ const rootRouteChildren: RootRouteChildren = {
   CalendarRoute: CalendarRoute,
   ContactRoute: ContactRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   ToolsRoute: ToolsRoute,
 }
 export const routeTree = rootRouteImport
