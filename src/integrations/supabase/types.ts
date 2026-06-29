@@ -14,16 +14,205 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          country: string | null
+          created_at: string
+          email: string | null
+          experience_level:
+            | Database["public"]["Enums"]["experience_level"]
+            | null
+          full_name: string | null
+          id: string
+          trading_style: string | null
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string | null
+          experience_level?:
+            | Database["public"]["Enums"]["experience_level"]
+            | null
+          full_name?: string | null
+          id: string
+          trading_style?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string | null
+          experience_level?:
+            | Database["public"]["Enums"]["experience_level"]
+            | null
+          full_name?: string | null
+          id?: string
+          trading_style?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      trades: {
+        Row: {
+          closed_at: string | null
+          created_at: string
+          entry: number
+          exit: number | null
+          id: string
+          lot_size: number | null
+          notes: string | null
+          opened_at: string
+          pair: string
+          pnl: number | null
+          screenshot_url: string | null
+          side: Database["public"]["Enums"]["trade_side"]
+          stop_loss: number | null
+          take_profit: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          closed_at?: string | null
+          created_at?: string
+          entry: number
+          exit?: number | null
+          id?: string
+          lot_size?: number | null
+          notes?: string | null
+          opened_at?: string
+          pair: string
+          pnl?: number | null
+          screenshot_url?: string | null
+          side: Database["public"]["Enums"]["trade_side"]
+          stop_loss?: number | null
+          take_profit?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          closed_at?: string | null
+          created_at?: string
+          entry?: number
+          exit?: number | null
+          id?: string
+          lot_size?: number | null
+          notes?: string | null
+          opened_at?: string
+          pair?: string
+          pnl?: number | null
+          screenshot_url?: string | null
+          side?: Database["public"]["Enums"]["trade_side"]
+          stop_loss?: number | null
+          take_profit?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_settings: {
+        Row: {
+          currency: string
+          language: string
+          notifications: boolean
+          time_zone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          currency?: string
+          language?: string
+          notifications?: boolean
+          time_zone?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          currency?: string
+          language?: string
+          notifications?: boolean
+          time_zone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      watchlist: {
+        Row: {
+          created_at: string
+          id: string
+          kind: Database["public"]["Enums"]["watchlist_kind"]
+          position: number
+          symbol: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["watchlist_kind"]
+          position?: number
+          symbol: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["watchlist_kind"]
+          position?: number
+          symbol?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
+      experience_level:
+        | "beginner"
+        | "intermediate"
+        | "advanced"
+        | "professional"
+      trade_side: "buy" | "sell"
+      watchlist_kind: "forex" | "crypto" | "stock"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +339,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+      experience_level: [
+        "beginner",
+        "intermediate",
+        "advanced",
+        "professional",
+      ],
+      trade_side: ["buy", "sell"],
+      watchlist_kind: ["forex", "crypto", "stock"],
+    },
   },
 } as const
