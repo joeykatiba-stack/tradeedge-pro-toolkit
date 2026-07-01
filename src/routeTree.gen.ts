@@ -23,6 +23,7 @@ import { Route as AuthenticatedJournalRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCalculatorsRouteImport } from './routes/_authenticated/calculators'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
+import { Route as AuthenticatedToolsStructureAnalysisRouteImport } from './routes/_authenticated/tools/structure-analysis'
 import { Route as AuthenticatedToolsLevelsRouteImport } from './routes/_authenticated/tools/levels'
 
 const ToolsRoute = ToolsRouteImport.update({
@@ -95,6 +96,12 @@ const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedToolsStructureAnalysisRoute =
+  AuthenticatedToolsStructureAnalysisRouteImport.update({
+    id: '/tools/structure-analysis',
+    path: '/tools/structure-analysis',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedToolsLevelsRoute =
   AuthenticatedToolsLevelsRouteImport.update({
     id: '/tools/levels',
@@ -117,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/tools/levels': typeof AuthenticatedToolsLevelsRoute
+  '/tools/structure-analysis': typeof AuthenticatedToolsStructureAnalysisRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -133,6 +141,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/tools/levels': typeof AuthenticatedToolsLevelsRoute
+  '/tools/structure-analysis': typeof AuthenticatedToolsStructureAnalysisRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -151,6 +160,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/tools/levels': typeof AuthenticatedToolsLevelsRoute
+  '/_authenticated/tools/structure-analysis': typeof AuthenticatedToolsStructureAnalysisRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/settings'
     | '/tools/levels'
+    | '/tools/structure-analysis'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/settings'
     | '/tools/levels'
+    | '/tools/structure-analysis'
   id:
     | '__root__'
     | '/'
@@ -202,6 +214,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/settings'
     | '/_authenticated/tools/levels'
+    | '/_authenticated/tools/structure-analysis'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -315,6 +328,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/tools/structure-analysis': {
+      id: '/_authenticated/tools/structure-analysis'
+      path: '/tools/structure-analysis'
+      fullPath: '/tools/structure-analysis'
+      preLoaderRoute: typeof AuthenticatedToolsStructureAnalysisRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/tools/levels': {
       id: '/_authenticated/tools/levels'
       path: '/tools/levels'
@@ -333,6 +353,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedToolsLevelsRoute: typeof AuthenticatedToolsLevelsRoute
+  AuthenticatedToolsStructureAnalysisRoute: typeof AuthenticatedToolsStructureAnalysisRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -343,6 +364,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedToolsLevelsRoute: AuthenticatedToolsLevelsRoute,
+  AuthenticatedToolsStructureAnalysisRoute:
+    AuthenticatedToolsStructureAnalysisRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
