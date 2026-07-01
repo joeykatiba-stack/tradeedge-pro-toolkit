@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      price_levels: {
+        Row: {
+          current_price: number | null
+          id: string
+          pdh: number | null
+          pdl: number | null
+          premium_discount_midpoint: number | null
+          pwh: number | null
+          pwl: number | null
+          round_numbers: Json
+          symbol: string
+          updated_at: string
+        }
+        Insert: {
+          current_price?: number | null
+          id?: string
+          pdh?: number | null
+          pdl?: number | null
+          premium_discount_midpoint?: number | null
+          pwh?: number | null
+          pwl?: number | null
+          round_numbers?: Json
+          symbol: string
+          updated_at?: string
+        }
+        Update: {
+          current_price?: number | null
+          id?: string
+          pdh?: number | null
+          pdl?: number | null
+          premium_discount_midpoint?: number | null
+          pwh?: number | null
+          pwl?: number | null
+          round_numbers?: Json
+          symbol?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -25,6 +64,7 @@ export type Database = {
             | null
           full_name: string | null
           id: string
+          plan_tier: Database["public"]["Enums"]["plan_tier"]
           trading_style: string | null
           updated_at: string
           username: string | null
@@ -39,6 +79,7 @@ export type Database = {
             | null
           full_name?: string | null
           id: string
+          plan_tier?: Database["public"]["Enums"]["plan_tier"]
           trading_style?: string | null
           updated_at?: string
           username?: string | null
@@ -53,9 +94,40 @@ export type Database = {
             | null
           full_name?: string | null
           id?: string
+          plan_tier?: Database["public"]["Enums"]["plan_tier"]
           trading_style?: string | null
           updated_at?: string
           username?: string | null
+        }
+        Relationships: []
+      }
+      structure_analysis: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          result_json: Json
+          symbol: string | null
+          timeframe: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          result_json: Json
+          symbol?: string | null
+          timeframe: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          result_json?: Json
+          symbol?: string | null
+          timeframe?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -211,6 +283,7 @@ export type Database = {
         | "intermediate"
         | "advanced"
         | "professional"
+      plan_tier: "free" | "pro" | "elite"
       trade_side: "buy" | "sell"
       watchlist_kind: "forex" | "crypto" | "stock"
     }
@@ -347,6 +420,7 @@ export const Constants = {
         "advanced",
         "professional",
       ],
+      plan_tier: ["free", "pro", "elite"],
       trade_side: ["buy", "sell"],
       watchlist_kind: ["forex", "crypto", "stock"],
     },
