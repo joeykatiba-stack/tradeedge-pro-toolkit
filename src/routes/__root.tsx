@@ -85,10 +85,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Risk calculators, forex session clock, trade journal, and analytics for forex, crypto and stock traders." },
       { name: "author", content: "TradeEdge" },
       { name: "theme-color", content: "#0B0F19" },
-      { property: "og:title", content: "TradeEdge Toolkit" },
-      { property: "og:description", content: "Everything a trader needs in one platform." },
+      { property: "og:title", content: "TradeEdge Toolkit — Your Complete Trading Toolkit" },
+      { property: "og:description", content: "Risk calculators, forex session clock, trade journal, and analytics for forex, crypto and stock traders." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "TradeEdge Toolkit — Your Complete Trading Toolkit" },
+      { name: "twitter:description", content: "Risk calculators, forex session clock, trade journal, and analytics for forex, crypto and stock traders." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/97ec8454-b729-40eb-a3bc-711d6dfee2cf" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/97ec8454-b729-40eb-a3bc-711d6dfee2cf" },
     ],
     links: [
       {
