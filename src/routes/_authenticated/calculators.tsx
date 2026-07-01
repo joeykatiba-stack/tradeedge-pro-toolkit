@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Calculators } from "@/components/calculators";
 
-export const Route = createFileRoute("/calculators")({
+export const Route = createFileRoute("/_authenticated/calculators")({
   head: () => ({
     meta: [
       { title: "Trading Calculators — TradeEdge Toolkit" },
-      { name: "description", content: "Position size, risk/reward, pip value, lot size, margin, profit/loss and compounding calculators for forex traders." },
+      { name: "description", content: "Position size, risk/reward, pip value, lot size, margin, profit/loss and compounding calculators." },
       { property: "og:title", content: "Trading Calculators" },
       { property: "og:description", content: "Seven essential calculators every trader needs." },
     ],

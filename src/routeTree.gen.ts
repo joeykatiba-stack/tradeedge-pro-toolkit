@@ -14,7 +14,6 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CalendarRouteImport } from './routes/calendar'
-import { Route as CalculatorsRouteImport } from './routes/calculators'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -22,7 +21,11 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedJournalRouteImport } from './routes/_authenticated/journal'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCalculatorsRouteImport } from './routes/_authenticated/calculators'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
+import { Route as AuthenticatedToolsStructureAnalysisRouteImport } from './routes/_authenticated/tools/structure-analysis'
+import { Route as AuthenticatedToolsLevelsRouteImport } from './routes/_authenticated/tools/levels'
+import { Route as AuthenticatedToolsEntryCheckRouteImport } from './routes/_authenticated/tools/entry-check'
 
 const ToolsRoute = ToolsRouteImport.update({
   id: '/tools',
@@ -47,11 +50,6 @@ const ContactRoute = ContactRouteImport.update({
 const CalendarRoute = CalendarRouteImport.update({
   id: '/calendar',
   path: '/calendar',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CalculatorsRoute = CalculatorsRouteImport.update({
-  id: '/calculators',
-  path: '/calculators',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -88,113 +86,154 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCalculatorsRoute =
+  AuthenticatedCalculatorsRouteImport.update({
+    id: '/calculators',
+    path: '/calculators',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedToolsStructureAnalysisRoute =
+  AuthenticatedToolsStructureAnalysisRouteImport.update({
+    id: '/tools/structure-analysis',
+    path: '/tools/structure-analysis',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedToolsLevelsRoute =
+  AuthenticatedToolsLevelsRouteImport.update({
+    id: '/tools/levels',
+    path: '/tools/levels',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedToolsEntryCheckRoute =
+  AuthenticatedToolsEntryCheckRouteImport.update({
+    id: '/tools/entry-check',
+    path: '/tools/entry-check',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/calculators': typeof CalculatorsRoute
   '/calendar': typeof CalendarRoute
   '/contact': typeof ContactRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tools': typeof ToolsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/calculators': typeof AuthenticatedCalculatorsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/journal': typeof AuthenticatedJournalRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/tools/entry-check': typeof AuthenticatedToolsEntryCheckRoute
+  '/tools/levels': typeof AuthenticatedToolsLevelsRoute
+  '/tools/structure-analysis': typeof AuthenticatedToolsStructureAnalysisRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/calculators': typeof CalculatorsRoute
   '/calendar': typeof CalendarRoute
   '/contact': typeof ContactRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tools': typeof ToolsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/calculators': typeof AuthenticatedCalculatorsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/journal': typeof AuthenticatedJournalRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/tools/entry-check': typeof AuthenticatedToolsEntryCheckRoute
+  '/tools/levels': typeof AuthenticatedToolsLevelsRoute
+  '/tools/structure-analysis': typeof AuthenticatedToolsStructureAnalysisRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/calculators': typeof CalculatorsRoute
   '/calendar': typeof CalendarRoute
   '/contact': typeof ContactRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tools': typeof ToolsRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
+  '/_authenticated/calculators': typeof AuthenticatedCalculatorsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/journal': typeof AuthenticatedJournalRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/tools/entry-check': typeof AuthenticatedToolsEntryCheckRoute
+  '/_authenticated/tools/levels': typeof AuthenticatedToolsLevelsRoute
+  '/_authenticated/tools/structure-analysis': typeof AuthenticatedToolsStructureAnalysisRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
-    | '/calculators'
     | '/calendar'
     | '/contact'
     | '/reset-password'
     | '/sitemap.xml'
     | '/tools'
     | '/analytics'
+    | '/calculators'
     | '/dashboard'
     | '/journal'
     | '/profile'
     | '/settings'
+    | '/tools/entry-check'
+    | '/tools/levels'
+    | '/tools/structure-analysis'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
-    | '/calculators'
     | '/calendar'
     | '/contact'
     | '/reset-password'
     | '/sitemap.xml'
     | '/tools'
     | '/analytics'
+    | '/calculators'
     | '/dashboard'
     | '/journal'
     | '/profile'
     | '/settings'
+    | '/tools/entry-check'
+    | '/tools/levels'
+    | '/tools/structure-analysis'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
-    | '/calculators'
     | '/calendar'
     | '/contact'
     | '/reset-password'
     | '/sitemap.xml'
     | '/tools'
     | '/_authenticated/analytics'
+    | '/_authenticated/calculators'
     | '/_authenticated/dashboard'
     | '/_authenticated/journal'
     | '/_authenticated/profile'
     | '/_authenticated/settings'
+    | '/_authenticated/tools/entry-check'
+    | '/_authenticated/tools/levels'
+    | '/_authenticated/tools/structure-analysis'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
-  CalculatorsRoute: typeof CalculatorsRoute
   CalendarRoute: typeof CalendarRoute
   ContactRoute: typeof ContactRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -237,13 +276,6 @@ declare module '@tanstack/react-router' {
       path: '/calendar'
       fullPath: '/calendar'
       preLoaderRoute: typeof CalendarRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/calculators': {
-      id: '/calculators'
-      path: '/calculators'
-      fullPath: '/calculators'
-      preLoaderRoute: typeof CalculatorsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -295,6 +327,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/calculators': {
+      id: '/_authenticated/calculators'
+      path: '/calculators'
+      fullPath: '/calculators'
+      preLoaderRoute: typeof AuthenticatedCalculatorsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/analytics': {
       id: '/_authenticated/analytics'
       path: '/analytics'
@@ -302,23 +341,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/tools/structure-analysis': {
+      id: '/_authenticated/tools/structure-analysis'
+      path: '/tools/structure-analysis'
+      fullPath: '/tools/structure-analysis'
+      preLoaderRoute: typeof AuthenticatedToolsStructureAnalysisRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tools/levels': {
+      id: '/_authenticated/tools/levels'
+      path: '/tools/levels'
+      fullPath: '/tools/levels'
+      preLoaderRoute: typeof AuthenticatedToolsLevelsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tools/entry-check': {
+      id: '/_authenticated/tools/entry-check'
+      path: '/tools/entry-check'
+      fullPath: '/tools/entry-check'
+      preLoaderRoute: typeof AuthenticatedToolsEntryCheckRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
+  AuthenticatedCalculatorsRoute: typeof AuthenticatedCalculatorsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedJournalRoute: typeof AuthenticatedJournalRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedToolsEntryCheckRoute: typeof AuthenticatedToolsEntryCheckRoute
+  AuthenticatedToolsLevelsRoute: typeof AuthenticatedToolsLevelsRoute
+  AuthenticatedToolsStructureAnalysisRoute: typeof AuthenticatedToolsStructureAnalysisRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
+  AuthenticatedCalculatorsRoute: AuthenticatedCalculatorsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedJournalRoute: AuthenticatedJournalRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedToolsEntryCheckRoute: AuthenticatedToolsEntryCheckRoute,
+  AuthenticatedToolsLevelsRoute: AuthenticatedToolsLevelsRoute,
+  AuthenticatedToolsStructureAnalysisRoute:
+    AuthenticatedToolsStructureAnalysisRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -328,7 +397,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
-  CalculatorsRoute: CalculatorsRoute,
   CalendarRoute: CalendarRoute,
   ContactRoute: ContactRoute,
   ResetPasswordRoute: ResetPasswordRoute,
@@ -338,13 +406,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

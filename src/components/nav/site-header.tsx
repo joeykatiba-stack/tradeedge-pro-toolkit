@@ -10,9 +10,11 @@ const NAV = [
   { to: "/dashboard", label: "Dashboard" },
   { to: "/tools", label: "Trading Tools" },
   { to: "/calculators", label: "Calculators" },
+  { to: "/tools/levels", label: "Live Levels" },
+  { to: "/tools/structure-analysis", label: "Structure AI" },
+  { to: "/tools/entry-check", label: "Entry Check" },
   { to: "/journal", label: "Journal" },
   { to: "/calendar", label: "Calendar" },
-  { to: "/analytics", label: "Analytics" },
   { to: "/contact", label: "Contact" },
 ] as const;
 
