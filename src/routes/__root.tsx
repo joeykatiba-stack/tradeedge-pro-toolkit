@@ -15,6 +15,7 @@ import { SiteHeader } from "@/components/nav/site-header";
 import { SiteFooter } from "@/components/nav/site-footer";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { registerPwa } from "@/lib/pwa-register";
 
 function NotFoundComponent() {
   return (
@@ -136,6 +137,10 @@ function RootComponent() {
     });
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
+
+  useEffect(() => {
+    void registerPwa();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
