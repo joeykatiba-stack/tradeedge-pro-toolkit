@@ -1,0 +1,15 @@
+{
+  "name": "TradeEdge Toolkit",
+  "short_name": "TradeEdge",
+  "description": "Risk calculators, session clock, journal, and AI market structure analysis for traders.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0B0F19",
+  "theme_color": "#0B0F19",
+  "icons": [
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
