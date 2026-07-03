@@ -48,6 +48,7 @@ function StructurePage() {
   const [timeframe, setTimeframe] = useState<string>("4H");
   const [symbol, setSymbol] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [filterTf, setFilterTf] = useState<string>("all");
 
   const { data: rows = [] } = useQuery({
     queryKey: ["structure_analysis"],
@@ -56,11 +57,14 @@ function StructurePage() {
         .from("structure_analysis")
         .select("*")
         .order("created_at", { ascending: false })
-        .limit(20);
+        .limit(200);
       if (error) throw error;
       return (data as unknown as Row[]) ?? [];
     },
   });
+
+  const filtered = filterTf === "all" ? rows : rows.filter((r) => r.timeframe === filterTf);
+  const available = Array.from(new Set(rows.map((r) => r.timeframe)));
 
   async function analyze() {
     if (!file) return toast.error("Choose a chart screenshot");
@@ -144,12 +148,29 @@ function StructurePage() {
         </CardContent>
       </Card>
 
-      <h2 className="font-display text-xl font-semibold mb-4">Recent</h2>
+      <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
+        <h2 className="font-display text-xl font-semibold">History</h2>
+        <div className="flex items-center gap-2">
+          <Label className="text-sm text-muted-foreground">Timeframe</Label>
+          <Select value={filterTf} onValueChange={setFilterTf}>
+            <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              {TIMEFRAMES.filter((t) => available.includes(t)).map((t) => (
+                <SelectItem key={t} value={t}>{t}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <span className="text-xs text-muted-foreground">{filtered.length} result{filtered.length === 1 ? "" : "s"}</span>
+        </div>
+      </div>
       <div className="grid gap-4 md:grid-cols-2">
-        {rows.length === 0 ? (
-          <p className="text-muted-foreground">No analyses yet.</p>
+        {filtered.length === 0 ? (
+          <p className="text-muted-foreground">
+            {rows.length === 0 ? "No analyses yet." : "No analyses match this timeframe."}
+          </p>
         ) : (
-          rows.map((r) => <AnalysisCard key={r.id} row={r} />)
+          filtered.map((r) => <AnalysisCard key={r.id} row={r} />)
         )}
       </div>
     </div>
