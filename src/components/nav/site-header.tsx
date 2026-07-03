@@ -4,6 +4,7 @@ import { Menu, X, LineChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
+import { PwaInstallButton } from "@/components/pwa-install-button";
 
 const NAV = [
   { to: "/", label: "Home" },
@@ -49,6 +50,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <PwaInstallButton />
           {!loading && (user ? (
             <Link to="/dashboard"><Button size="sm" variant="default">Dashboard</Button></Link>
           ) : (
