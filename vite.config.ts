@@ -5,11 +5,69 @@
 //     error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
+  },
+  vite: {
+    plugins: [
+      VitePWA({
+        registerType: "autoUpdate",
+        injectRegister: null,
+        filename: "sw.js",
+        devOptions: { enabled: false },
+        manifest: false,
+        workbox: {
+          globPatterns: ["**/*.{js,css,html,ico,png,svg,webmanifest,woff2}"],
+          navigateFallback: "/",
+          navigateFallbackDenylist: [/^\/~oauth/, /^\/api\//],
+          runtimeCaching: [
+            {
+              urlPattern: ({ request }) => request.mode === "navigate",
+              handler: "NetworkFirst",
+              options: {
+                cacheName: "html-nav",
+                networkTimeoutSeconds: 4,
+                expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 7 },
+              },
+            },
+            {
+              urlPattern: ({ url, sameOrigin }) =>
+                sameOrigin && /\.(?:js|css|woff2|png|svg|ico)$/.test(url.pathname),
+              handler: "CacheFirst",
+              options: {
+                cacheName: "static-assets",
+                expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              },
+            },
+            {
+              urlPattern: ({ url }) =>
+                url.hostname.endsWith(".supabase.co") && url.pathname.includes("/rest/v1/structure_analysis"),
+              handler: "NetworkFirst",
+              options: {
+                cacheName: "structure-analysis-api",
+                networkTimeoutSeconds: 4,
+                expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 * 14 },
+                cacheableResponse: { statuses: [0, 200] },
+              },
+            },
+            {
+              urlPattern: ({ url }) =>
+                url.hostname.endsWith(".supabase.co") && url.pathname.includes("/storage/v1/"),
+              handler: "CacheFirst",
+              options: {
+                cacheName: "chart-screenshots",
+                expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 30 },
+                cacheableResponse: { statuses: [0, 200] },
+              },
+            },
+          ],
+        },
+      }),
+    ],
   },
 });
