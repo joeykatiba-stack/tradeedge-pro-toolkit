@@ -31,7 +31,10 @@ function SettingsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
-      <h1 className="font-display text-3xl sm:text-4xl font-bold mb-6">Settings</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="font-display text-3xl sm:text-4xl font-bold">Settings</h1>
+        <PwaInstallButton />
+      </div>
       <div className="glass-strong rounded-2xl p-6 space-y-5">
         <div className="flex items-center justify-between">
           <div><Label className="text-base">Notifications</Label><p className="text-xs text-muted-foreground">Receive trade and market alerts</p></div>
