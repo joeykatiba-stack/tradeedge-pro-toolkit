@@ -1,5 +1,6 @@
-// Accepts a storage path for a chart screenshot, calls Google Gemini
-// (vision) to identify trend, BOS/CHoCH, swing high/low, and bias, and
+// Accepts a storage path for a chart screenshot, calls a Hugging Face
+// vision-language model (via the Inference Providers OpenAI-compatible
+// router) to identify trend, BOS/CHoCH, swing high/low, and bias, and
 // stores the structured result in structure_analysis.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { corsHeaders } from "../_shared/cors.ts";
@@ -24,39 +25,44 @@ Rules:
 - "reasoning" must be one short paragraph (max 3 sentences) explaining the call.
 - Never wrap the JSON in code fences. Never add commentary before or after.`;
 
-async function callGemini(imageBase64: string, mediaType: string) {
-  const apiKey = Deno.env.get("GEMINI_API_KEY")!;
-  const model = "gemini-2.0-flash";
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-  const res = await fetch(url, {
+async function callHuggingFace(imageBase64: string, mediaType: string) {
+  const apiKey = Deno.env.get("HUGGINGFACE_API_KEY");
+  if (!apiKey) throw new Error("Missing HUGGINGFACE_API_KEY secret");
+  const model = Deno.env.get("HF_VISION_MODEL") ?? "meta-llama/Llama-3.2-11B-Vision-Instruct";
+  const dataUrl = `data:${mediaType};base64,${imageBase64}`;
+  const res = await fetch("https://router.huggingface.co/v1/chat/completions", {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: {
+      "content-type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
     body: JSON.stringify({
-      systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-      contents: [
+      model,
+      temperature: 0.2,
+      max_tokens: 1024,
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
         {
           role: "user",
-          parts: [
-            { inlineData: { mimeType: mediaType, data: imageBase64 } },
-            { text: "Analyse this chart and respond with JSON only." },
+          content: [
+            { type: "text", text: "Analyse this chart and respond with JSON only." },
+            { type: "image_url", image_url: { url: dataUrl } },
           ],
         },
       ],
-      generationConfig: {
-        temperature: 0.2,
-        maxOutputTokens: 1024,
-        responseMimeType: "application/json",
-      },
     }),
   });
   if (!res.ok) {
     const t = await res.text();
-    throw new Error(`Gemini ${res.status}: ${t}`);
+    throw new Error(`HuggingFace ${res.status}: ${t}`);
   }
   const data = await res.json();
-  const text: string =
-    data?.candidates?.[0]?.content?.parts?.map((p: { text?: string }) => p.text ?? "").join("") ?? "";
-  return text.trim().replace(/^```json\s*|\s*```$/g, "");
+  const text: string = data?.choices?.[0]?.message?.content ?? "";
+  return text
+    .trim()
+    .replace(/^```json\s*/i, "")
+    .replace(/^```\s*/i, "")
+    .replace(/\s*```$/i, "");
 }
 
 Deno.serve(async (req) => {
@@ -102,12 +108,15 @@ Deno.serve(async (req) => {
     const b64 = btoa(binary);
     const mediaType = file.type || "image/png";
 
-    const jsonText = await callGemini(b64, mediaType);
+    const jsonText = await callHuggingFace(b64, mediaType);
     let parsed: unknown;
     try {
       parsed = JSON.parse(jsonText);
     } catch {
-      throw new Error(`Gemini returned non-JSON: ${jsonText.slice(0, 200)}`);
+      // Best-effort: extract first JSON object from the response.
+      const match = jsonText.match(/\{[\s\S]*\}/);
+      if (!match) throw new Error(`Model returned non-JSON: ${jsonText.slice(0, 200)}`);
+      parsed = JSON.parse(match[0]);
     }
 
     const { data: signed } = await admin.storage
