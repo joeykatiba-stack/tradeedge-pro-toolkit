@@ -25,44 +25,68 @@ Rules:
 - "reasoning" must be one short paragraph (max 3 sentences) explaining the call.
 - Never wrap the JSON in code fences. Never add commentary before or after.`;
 
+const DEFAULT_HF_VISION_MODEL = "google/gemma-3-4b-it";
+const HF_VISION_MODEL_FALLBACKS = [
+  DEFAULT_HF_VISION_MODEL,
+  "google/gemma-3n-E4B-it",
+  "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+];
+
 async function callHuggingFace(imageBase64: string, mediaType: string) {
   const apiKey = Deno.env.get("HUGGINGFACE_API_KEY");
   if (!apiKey) throw new Error("Missing HUGGINGFACE_API_KEY secret");
-  const model = Deno.env.get("HF_VISION_MODEL") ?? "Qwen/Qwen2.5-VL-7B-Instruct";
+  const preferredModel = Deno.env.get("HF_VISION_MODEL") ?? DEFAULT_HF_VISION_MODEL;
+  const models = Array.from(new Set([preferredModel, ...HF_VISION_MODEL_FALLBACKS]));
   const dataUrl = `data:${mediaType};base64,${imageBase64}`;
-  const res = await fetch("https://router.huggingface.co/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model,
-      temperature: 0.2,
-      max_tokens: 1024,
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        {
-          role: "user",
-          content: [
-            { type: "text", text: "Analyse this chart and respond with JSON only." },
-            { type: "image_url", image_url: { url: dataUrl } },
-          ],
-        },
-      ],
-    }),
-  });
-  if (!res.ok) {
-    const t = await res.text();
-    throw new Error(`HuggingFace ${res.status}: ${t}`);
+
+  let lastError = "";
+  for (const model of models) {
+    const res = await fetch("https://router.huggingface.co/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model,
+        temperature: 0.2,
+        max_tokens: 1024,
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          {
+            role: "user",
+            content: [
+              { type: "text", text: "Analyse this chart and respond with JSON only." },
+              { type: "image_url", image_url: { url: dataUrl } },
+            ],
+          },
+        ],
+      }),
+    });
+
+    if (!res.ok) {
+      const t = await res.text();
+      lastError = `HuggingFace ${res.status} (${model}): ${t}`;
+      console.warn(`[analyze-structure] ${lastError}`);
+      continue;
+    }
+
+    const data = await res.json();
+    const text: string = data?.choices?.[0]?.message?.content ?? "";
+    if (!text.trim()) {
+      lastError = `HuggingFace returned an empty response (${model})`;
+      console.warn(`[analyze-structure] ${lastError}`);
+      continue;
+    }
+
+    return text
+      .trim()
+      .replace(/^```json\s*/i, "")
+      .replace(/^```\s*/i, "")
+      .replace(/\s*```$/i, "");
   }
-  const data = await res.json();
-  const text: string = data?.choices?.[0]?.message?.content ?? "";
-  return text
-    .trim()
-    .replace(/^```json\s*/i, "")
-    .replace(/^```\s*/i, "")
-    .replace(/\s*```$/i, "");
+
+  throw new Error(lastError || "HuggingFace vision analysis failed");
 }
 
 Deno.serve(async (req) => {
