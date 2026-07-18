@@ -28,7 +28,7 @@ Rules:
 async function callHuggingFace(imageBase64: string, mediaType: string) {
   const apiKey = Deno.env.get("HUGGINGFACE_API_KEY");
   if (!apiKey) throw new Error("Missing HUGGINGFACE_API_KEY secret");
-  const model = Deno.env.get("HF_VISION_MODEL") ?? "meta-llama/Llama-3.2-11B-Vision-Instruct";
+  const model = Deno.env.get("HF_VISION_MODEL") ?? "Qwen/Qwen2.5-VL-7B-Instruct";
   const dataUrl = `data:${mediaType};base64,${imageBase64}`;
   const res = await fetch("https://router.huggingface.co/v1/chat/completions", {
     method: "POST",
