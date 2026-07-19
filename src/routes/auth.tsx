@@ -19,9 +19,27 @@ function AuthPage() {
   const [email, setEmail] = useState(""); const [password, setPassword] = useState(""); const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [forgot, setForgot] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => { if (data.session) navigate({ to: "/dashboard" }); });
+    let cancelled = false;
+    supabase.auth.getSession().then(({ data }) => {
+      if (cancelled) return;
+      if (data.session) {
+        navigate({ to: "/dashboard", replace: true });
+      } else {
+        setCheckingSession(false);
+      }
+    }).catch((err) => {
+      console.error("[auth] getSession failed", err);
+      if (!cancelled) setCheckingSession(false);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session) {
+        navigate({ to: "/dashboard", replace: true });
+      }
+    });
+    return () => { cancelled = true; sub.subscription.unsubscribe(); };
   }, [navigate]);
 
   async function signIn(e: React.FormEvent) {
@@ -43,10 +61,21 @@ function AuthPage() {
     navigate({ to: "/dashboard" });
   }
   async function google() {
-    const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
-    if (r.error) toast.error(r.error.message ?? "Google sign-in failed");
-    if (r.redirected) return;
-    navigate({ to: "/dashboard" });
+    try {
+      const r = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: `${window.location.origin}/auth`,
+      });
+      if (r.error) {
+        console.error("[auth] Google sign-in error", r.error);
+        toast.error(r.error.message ?? "Google sign-in failed");
+        return;
+      }
+      if (r.redirected) return;
+      // Popup flow: session was set inside the wrapper — onAuthStateChange will route us.
+    } catch (err) {
+      console.error("[auth] Google sign-in threw", err);
+      toast.error(err instanceof Error ? err.message : "Google sign-in failed");
+    }
   }
   async function reset(e: React.FormEvent) {
     e.preventDefault();
@@ -58,6 +87,9 @@ function AuthPage() {
 
   return (
     <div className="container mx-auto px-4 py-16 min-h-[calc(100vh-4rem)] flex items-center justify-center">
+      {checkingSession ? (
+        <div className="text-sm text-muted-foreground">Restoring your session…</div>
+      ) : (
       <div className="w-full max-w-md glass-strong rounded-3xl p-8">
         <div className="text-center mb-6">
           <span className="inline-grid h-12 w-12 place-items-center rounded-2xl mb-3" style={{ background: "var(--gradient-primary)" }}><LineChart className="h-6 w-6 text-white" /></span>
@@ -98,6 +130,7 @@ function AuthPage() {
           </>
         )}
       </div>
+      )}
     </div>
   );
 }
