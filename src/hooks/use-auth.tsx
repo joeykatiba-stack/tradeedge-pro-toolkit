@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -10,14 +10,19 @@ type AuthState = {
   refreshSession: () => Promise<Session | null>;
 };
 
+type AuthProviderProps = {
+  children: ReactNode;
+  onIdentityChange?: (event: string, session: Session | null) => void;
+};
+
 const AuthContext = createContext<AuthState | null>(null);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ children, onIdentityChange }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [initialized, setInitialized] = useState(false);
 
-  async function refreshSession() {
+  const refreshSession = useCallback(async () => {
     const { data, error } = await supabase.auth.getSession();
     if (error) {
       console.error("[auth] Session refresh failed", error);
@@ -30,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.session?.user ?? null);
     setInitialized(true);
     return data.session ?? null;
-  }
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -41,6 +46,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(nextSession ?? null);
       setUser(nextSession?.user ?? null);
       setInitialized(true);
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
+        onIdentityChange?.(event, nextSession ?? null);
+      }
     });
 
     refreshSession().catch((error) => {
@@ -55,11 +63,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       active = false;
       sub.subscription.unsubscribe();
     };
-  }, []);
+  }, [onIdentityChange, refreshSession]);
 
   const value = useMemo<AuthState>(
     () => ({ user, session, loading: !initialized, initialized, refreshSession }),
-    [user, session, initialized],
+    [user, session, initialized, refreshSession],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
