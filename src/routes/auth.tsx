@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { LineChart } from "lucide-react";
+import { exchangeOAuthCodeFromUrl, getSafeAuthRedirect, saveAuthRedirect } from "@/lib/auth-flow";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Sign In — TradeEdge Toolkit" }, { name: "description", content: "Sign in or create an account on TradeEdge Toolkit." }] }),
@@ -16,65 +18,89 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { user, loading: authLoading, refreshSession } = useAuth();
   const [email, setEmail] = useState(""); const [password, setPassword] = useState(""); const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [forgot, setForgot] = useState(false);
-  const [checkingSession, setCheckingSession] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
-    supabase.auth.getSession().then(({ data }) => {
-      if (cancelled) return;
-      if (data.session) {
-        navigate({ to: "/dashboard", replace: true });
-      } else {
-        setCheckingSession(false);
+
+    async function finishPendingOAuthCallback() {
+      const url = new URL(window.location.href);
+      if (!url.searchParams.has("code") && !url.searchParams.has("error")) return;
+
+      try {
+        const session = await exchangeOAuthCodeFromUrl(window.location.href);
+        const restored = session ?? (await refreshSession());
+        if (restored && !cancelled) navigate({ to: "/dashboard", replace: true });
+      } catch (error) {
+        console.error("[auth] Inline OAuth callback failed", error);
+        toast.error(error instanceof Error ? error.message : "Google sign-in failed");
       }
-    }).catch((err) => {
-      console.error("[auth] getSession failed", err);
-      if (!cancelled) setCheckingSession(false);
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
-      if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session) {
-        navigate({ to: "/dashboard", replace: true });
-      }
-    });
-    return () => { cancelled = true; sub.subscription.unsubscribe(); };
-  }, [navigate]);
+    }
+
+    void finishPendingOAuthCallback();
+    return () => { cancelled = true; };
+  }, [navigate, refreshSession]);
+
+  useEffect(() => {
+    if (!authLoading && user) navigate({ to: "/dashboard", replace: true });
+  }, [authLoading, user, navigate]);
 
   async function signIn(e: React.FormEvent) {
     e.preventDefault(); setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) return toast.error(error.message);
-    navigate({ to: "/dashboard" });
+    await refreshSession();
+    navigate({ to: "/dashboard", replace: true });
   }
   async function signUp(e: React.FormEvent) {
     e.preventDefault(); setLoading(true);
     const { error } = await supabase.auth.signUp({
       email, password,
-      options: { emailRedirectTo: `${window.location.origin}/dashboard`, data: { full_name: name } },
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback?redirect=%2Fdashboard`, data: { full_name: name } },
     });
     setLoading(false);
     if (error) return toast.error(error.message);
+    const session = await refreshSession();
     toast.success("Account created! Check your email if confirmation is required.");
-    navigate({ to: "/dashboard" });
+    if (session) navigate({ to: "/dashboard", replace: true });
   }
   async function google() {
+    setLoading(true);
+    const redirectPath = getSafeAuthRedirect("/dashboard");
+    saveAuthRedirect(redirectPath);
     try {
       const r = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: `${window.location.origin}/auth`,
+        redirect_uri: `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirectPath)}`,
       });
       if (r.error) {
-        console.error("[auth] Google sign-in error", r.error);
-        toast.error(r.error.message ?? "Google sign-in failed");
+        const session = await refreshSession();
+        if (session) {
+          navigate({ to: redirectPath, replace: true });
+          return;
+        }
+
+        console.error("[auth] Google sign-in failed", r.error);
+        const message = r.error.message ?? "Google sign-in failed";
+        toast.error(message === "Sign in was cancelled" ? "Google sign-in was not completed." : message);
         return;
       }
       if (r.redirected) return;
-      // Popup flow: session was set inside the wrapper — onAuthStateChange will route us.
+      const session = await refreshSession();
+      if (session) navigate({ to: redirectPath, replace: true });
     } catch (err) {
+      const session = await refreshSession();
+      if (session) {
+        navigate({ to: redirectPath, replace: true });
+        return;
+      }
       console.error("[auth] Google sign-in threw", err);
       toast.error(err instanceof Error ? err.message : "Google sign-in failed");
+    } finally {
+      setLoading(false);
     }
   }
   async function reset(e: React.FormEvent) {
@@ -87,7 +113,7 @@ function AuthPage() {
 
   return (
     <div className="container mx-auto px-4 py-16 min-h-[calc(100vh-4rem)] flex items-center justify-center">
-      {checkingSession ? (
+      {authLoading || user ? (
         <div className="text-sm text-muted-foreground">Restoring your session…</div>
       ) : (
       <div className="w-full max-w-md glass-strong rounded-3xl p-8">
@@ -106,7 +132,7 @@ function AuthPage() {
           </form>
         ) : (
           <>
-            <Button onClick={google} variant="outline" className="w-full mb-4">Continue with Google</Button>
+            <Button onClick={google} disabled={loading} variant="outline" className="w-full mb-4">Continue with Google</Button>
             <div className="flex items-center gap-3 text-xs text-muted-foreground mb-4"><span className="h-px flex-1 bg-border" />OR<span className="h-px flex-1 bg-border" /></div>
             <Tabs defaultValue="signin">
               <TabsList className="grid grid-cols-2 w-full"><TabsTrigger value="signin">Sign In</TabsTrigger><TabsTrigger value="signup">Sign Up</TabsTrigger></TabsList>
