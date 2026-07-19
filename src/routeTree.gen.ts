@@ -17,6 +17,7 @@ import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedJournalRouteImport } from './routes/_authenticated/journal'
@@ -65,6 +66,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => AuthRoute,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
@@ -118,7 +124,7 @@ const AuthenticatedToolsEntryCheckRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/calendar': typeof CalendarRoute
   '/contact': typeof ContactRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -130,13 +136,14 @@ export interface FileRoutesByFullPath {
   '/journal': typeof AuthenticatedJournalRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/tools/entry-check': typeof AuthenticatedToolsEntryCheckRoute
   '/tools/levels': typeof AuthenticatedToolsLevelsRoute
   '/tools/structure-analysis': typeof AuthenticatedToolsStructureAnalysisRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/calendar': typeof CalendarRoute
   '/contact': typeof ContactRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -148,6 +155,7 @@ export interface FileRoutesByTo {
   '/journal': typeof AuthenticatedJournalRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/tools/entry-check': typeof AuthenticatedToolsEntryCheckRoute
   '/tools/levels': typeof AuthenticatedToolsLevelsRoute
   '/tools/structure-analysis': typeof AuthenticatedToolsStructureAnalysisRoute
@@ -156,7 +164,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/calendar': typeof CalendarRoute
   '/contact': typeof ContactRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   '/_authenticated/journal': typeof AuthenticatedJournalRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/_authenticated/tools/entry-check': typeof AuthenticatedToolsEntryCheckRoute
   '/_authenticated/tools/levels': typeof AuthenticatedToolsLevelsRoute
   '/_authenticated/tools/structure-analysis': typeof AuthenticatedToolsStructureAnalysisRoute
@@ -188,6 +197,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/profile'
     | '/settings'
+    | '/auth/callback'
     | '/tools/entry-check'
     | '/tools/levels'
     | '/tools/structure-analysis'
@@ -206,6 +216,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/profile'
     | '/settings'
+    | '/auth/callback'
     | '/tools/entry-check'
     | '/tools/levels'
     | '/tools/structure-analysis'
@@ -225,6 +236,7 @@ export interface FileRouteTypes {
     | '/_authenticated/journal'
     | '/_authenticated/profile'
     | '/_authenticated/settings'
+    | '/auth/callback'
     | '/_authenticated/tools/entry-check'
     | '/_authenticated/tools/levels'
     | '/_authenticated/tools/structure-analysis'
@@ -233,7 +245,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  AuthRoute: typeof AuthRoute
+  AuthRoute: typeof AuthRouteWithChildren
   CalendarRoute: typeof CalendarRoute
   ContactRoute: typeof ContactRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -298,6 +310,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
@@ -393,10 +412,20 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AuthRouteChildren {
+  AuthCallbackRoute: typeof AuthCallbackRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthCallbackRoute: AuthCallbackRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  AuthRoute: AuthRoute,
+  AuthRoute: AuthRouteWithChildren,
   CalendarRoute: CalendarRoute,
   ContactRoute: ContactRoute,
   ResetPasswordRoute: ResetPasswordRoute,
