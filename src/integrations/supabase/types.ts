@@ -16,10 +16,16 @@ export type Database = {
     Tables: {
       price_levels: {
         Row: {
+          asset_class: string | null
           current_price: number | null
+          equilibrium: number | null
           id: string
           pdh: number | null
           pdl: number | null
+          pmh: number | null
+          pml: number | null
+          pqh: number | null
+          pql: number | null
           premium_discount_midpoint: number | null
           pwh: number | null
           pwl: number | null
@@ -28,10 +34,16 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          asset_class?: string | null
           current_price?: number | null
+          equilibrium?: number | null
           id?: string
           pdh?: number | null
           pdl?: number | null
+          pmh?: number | null
+          pml?: number | null
+          pqh?: number | null
+          pql?: number | null
           premium_discount_midpoint?: number | null
           pwh?: number | null
           pwl?: number | null
@@ -40,10 +52,16 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          asset_class?: string | null
           current_price?: number | null
+          equilibrium?: number | null
           id?: string
           pdh?: number | null
           pdl?: number | null
+          pmh?: number | null
+          pml?: number | null
+          pqh?: number | null
+          pql?: number | null
           premium_discount_midpoint?: number | null
           pwh?: number | null
           pwl?: number | null
