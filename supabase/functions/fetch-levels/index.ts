@@ -148,16 +148,22 @@ Deno.serve(async (req) => {
       : "";
     const hasCronSecret = !!cronSecret && !!providedSecret && providedSecret === cronSecret;
     const hasServiceRole = !!serviceRoleKey && !!bearer && bearer === serviceRoleKey;
-    if (!hasCronSecret && !hasServiceRole) {
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+    let hasVaultMatch = false;
+    if (!hasCronSecret && !hasServiceRole && providedSecret) {
+      const { data: ok } = await supabaseAdmin.rpc("verify_fetch_levels_secret", { _secret: providedSecret });
+      hasVaultMatch = ok === true;
+    }
+    if (!hasCronSecret && !hasServiceRole && !hasVaultMatch) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "content-type": "application/json" },
       });
     }
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    );
+    const supabase = supabaseAdmin;
 
     // Optional: fetch a single ad-hoc symbol (e.g. a stock ticker) instead of the full watchlist.
     let payload: { symbol?: string; td?: string; assetClass?: string } = {};
