@@ -411,3 +411,15 @@ export function Calculators() {
         </TabsList>
         <div className="glass-strong rounded-2xl p-6 mt-4">
           <TabsContent value="position"><PositionSize shared={shared} setShared={setShared} /></TabsConte
+<TabsContent value="position"><PositionSize shared={shared} setShared={setShared} /></TabsContent>
+          <TabsContent value="rr"><RiskReward shared={shared} setShared={setShared} /></TabsContent>
+          <TabsContent value="point"><PointValue shared={shared} setShared={setShared} /></TabsContent>
+          <TabsContent value="size"><SizeByStopDistance shared={shared} setShared={setShared} /></TabsContent>
+          <TabsContent value="margin"><Margin shared={shared} setShared={setShared} /></TabsContent>
+          <TabsContent value="pl"><ProfitLoss shared={shared} setShared={setShared} /></TabsContent>
+          <TabsContent value="compound"><Compounding shared={shared} setShared={setShared} /></TabsContent>
+        </div>
+      </Tabs>
+    </div>
+  );
+    }
