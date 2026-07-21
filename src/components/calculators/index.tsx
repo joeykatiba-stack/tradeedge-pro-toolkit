@@ -29,10 +29,6 @@ function Result({ label, value, accent }: { label: string; value: string; accent
   );
 }
 
-// ---- Instrument catalog ----
-// `multiplier` = dollars of P/L per 1.00 unit of price movement, for ONE standard unit
-// (1 standard lot for forex, 1 contract for futures, 1 share for stocks, 1 coin for crypto).
-// notional value of a position = quantity * price * multiplier
 type AssetCategory = "forex" | "futures" | "crypto" | "stocks";
 
 type Instrument = { symbol: string; multiplier: number; decimals: number };
@@ -80,16 +76,15 @@ function getInstrument(category: AssetCategory, symbol: string): Instrument {
   return found ?? CATALOG[category][0];
 }
 
-// ---- Shared state lifted to the top level so every calculator + the instrument bar reads/writes the same values ----
 type Shared = {
   category: AssetCategory;
-  pair: string; // symbol for forex/futures/crypto, free-text ticker for stocks
+  pair: string;
   accountBalance: string;
   riskPercent: string;
   entryPrice: string;
   stopLoss: string;
   takeProfit: string;
-  lotSize: string; // quantity in the instrument's native unit (lots/contracts/coins/shares)
+  lotSize: string;
   side: "buy" | "sell";
 };
 
@@ -132,7 +127,6 @@ function SaveButton({ onClick, pending }: { onClick: () => void; pending: boolea
   );
 }
 
-// ---- Instrument bar shown above every calculator ----
 function InstrumentBar({ shared, setShared }: { shared: Shared; setShared: SetShared }) {
   const categories: AssetCategory[] = ["forex", "futures", "crypto", "stocks"];
   return (
@@ -199,9 +193,7 @@ function PositionSize({ shared, setShared }: { shared: Shared; setShared: SetSha
       </div>
     </div>
   );
-}
-
-function RiskReward({ shared, setShared }: { shared: Shared; setShared: SetShared }) {
+        }function RiskReward({ shared, setShared }: { shared: Shared; setShared: SetShared }) {
   const { entryPrice: entry, stopLoss: sl, takeProfit: tp } = shared;
   const risk = Math.abs(num(entry) - num(sl));
   const reward = Math.abs(num(tp) - num(entry));
@@ -301,9 +293,7 @@ function Margin({ shared, setShared }: { shared: Shared; setShared: SetShared })
       </div>
     </div>
   );
-}
-
-function ProfitLoss({ shared, setShared }: { shared: Shared; setShared: SetShared }) {
+                       }function ProfitLoss({ shared, setShared }: { shared: Shared; setShared: SetShared }) {
   const instrument = getInstrument(shared.category, shared.pair);
   const { entryPrice: entry, lotSize: qty, side } = shared;
   const [exit, setExit] = useState("1.1100");
@@ -410,8 +400,7 @@ export function Calculators() {
           <TabsTrigger value="compound">Compounding</TabsTrigger>
         </TabsList>
         <div className="glass-strong rounded-2xl p-6 mt-4">
-          <TabsContent value="position"><PositionSize shared={shared} setShared={setShared} /></TabsConte
-<TabsContent value="position"><PositionSize shared={shared} setShared={setShared} /></TabsContent>
+          <TabsContent value="position"><PositionSize shared={shared} setShared={setShared} /></TabsContent>
           <TabsContent value="rr"><RiskReward shared={shared} setShared={setShared} /></TabsContent>
           <TabsContent value="point"><PointValue shared={shared} setShared={setShared} /></TabsContent>
           <TabsContent value="size"><SizeByStopDistance shared={shared} setShared={setShared} /></TabsContent>
@@ -422,4 +411,4 @@ export function Calculators() {
       </Tabs>
     </div>
   );
-    }
+  }
